@@ -26,4 +26,22 @@
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
+
+  <ItemGroup Condition="false">
+    <!-- Fix Verify file nesting for Razor. See https://github.com/VerifyTests/Verify.Bunit/issues/108 -->
+    <None
+      Include="**\*.received.*;**\*.verified.*"
+      Exclude="bin\**"
+      Condition="$(Language) == 'C#'"
+    >
+      <ParentFile>$([System.String]::Copy('%(FileName)').Split('.')[0].Split('(')[0])</ParentFile>
+      <ParentRelativeDir>%(RelativeDir)</ParentRelativeDir>
+      <ParentExtension>.cs</ParentExtension>
+      <ParentExtension
+        Condition="Exists('$(MSBuildProjectDirectory)\%(ParentRelativeDir)%(ParentFile).razor.cs')"
+        >.razor.cs</ParentExtension
+      >
+      <DependentUpon>%(ParentFile)%(ParentExtension)</DependentUpon>
+    </None>
+  </ItemGroup>
 </Project>
